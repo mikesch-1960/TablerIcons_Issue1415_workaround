@@ -1,0 +1,9 @@
+{
+  "workbench.colorCustomizations": {
+    "activityBar.background": "#0b4d34",
+    "activityBar.foreground": "#ffffff",
+
+    "statusBar.background": "#810b0b",
+  },
+  "commentTranslate.hover.enabled": true
+}

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="data:,">
+  <title>Tabler Icons Workaround Test</title>
+
+  <link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: sans-serif;
+      font-size: 12px;
+      padding-left: 30px;
+    }
+
+    section { margin-bottom: 30px; }
+
+    button {
+      padding: 8px 14px;
+      margin: 5px;
+      cursor: pointer;
+      font-size: 100%;
+    }
+
+    #output {
+      margin-top: 15px;
+      /* font-size: 300%; */
+    }
+
+    i {
+      font-size: 300%;
+      margin-right: 20px;
+      vertical-align: middle;
+      color: var(--fi-icon-color, purple);
+    }
+
+    .fi-green   { --fi-icon-color: #2ecc71; }
+    .fi-red     { --fi-icon-color: #e74c3c; }
+    .fi-orange  { --fi-icon-color: #ff7700; }
+    .fi-blue    { --fi-icon-color: #3498db; }
+  </style>
+</head>
+
+<body>
+<main>
+  <h1>Test for Tabler Icons Workaround</h1>
+  <br>
+  <hr>
+
+  <section>
+    <h2>Static icons</h2>
+
+    <i class="dummy ti ti-heart fi-red" id="first"></i>
+    <i class="fi-green ti ti-heart-filled"></i>
+    <i class="ti ti-star fi-orange"></i>
+    <i class="fi-blue ti ti-square-filled"></i>
+    <button onclick="swapIcon()">Swap first with random (Uses function from the workaround API)</button>
+  </section>
+
+  <hr>
+
+  <section>
+    <h2>Add with JavaScript</h2>
+
+    <div id="output"></div>
+    <button onclick="addIcon()">Add random icon</button>
+  </section>
+
+  <hr>
+
+  <section>
+    <h2>Change existing icon with JavaScript</h2>
+
+    <i id="changeThisIcon" class="ti ti-star"></i>
+    <br>
+    <button onclick="toggleIcon()">Toggle filled</button>
+  </section>
+
+  <hr>
+
+  <section>
+    <h2>Change with classList, prototype remove & add</h2>
+
+    <i id="classListIconRA" class="fi-blue ti ti-heart"></i>
+    <br>
+    <button onclick="changeWith_remove_add()">Use classList r & a</button>
+  </section>
+
+  <hr>
+
+  <section>
+    <h2>Change with classList, prototype contains</h2>
+
+    <i id="classListIconC" class="ti ti-square-filled fi-orange"></i>
+    <br>
+    <button onclick="changeWith_contains(this)">Use classList c</button>
+  </section>
+
+
+  <!-- load the workaround script -->
+  <script src="./table-icon-issue1415-workaround.js"></script>
+
+
+  <script>
+    const DEMO_ICONS = ['ti-heart', 'ti-heart-filled', 'ti-star', 'ti-star-filled', 'ti-square', 'ti-square-filled'];
+
+
+    // Test for a API function of the workaround
+    function swapIcon() {
+      const iconEl  = document.getElementById('first');
+      const newIcon = DEMO_ICONS[Math.floor(Math.random() * DEMO_ICONS.length)];
+      TABLER_WA.replaceIcon(iconEl, newIcon);
+    }
+
+
+
+    // Test for changing icon with JavaScript that adds a new icon
+    function addIcon() {
+      document.getElementById('output').innerHTML += `<i class="ti ${DEMO_ICONS[Math.floor(Math.random() * DEMO_ICONS.length)]}"></i>`;
+    }
+
+
+    // Test for changing icon with JavaScript from outline to filled (using className)
+    let sToggle = false;
+    function toggleIcon() {
+      const ico = document.getElementById('changeThisIcon');
+
+      if (sToggle) {
+        ico.className = ico.className = 'ti ti-star';
+      } else {
+        ico.className = ico.className = 'ti ti-star-filled';
+      }
+      sToggle = !sToggle;
+    }
+
+
+    // Test for changing icon with JavaScript from filled to outline (using classList)
+    let sFilled = false;
+    function changeWith_remove_add() {
+      const icon = document.getElementById('classListIconRA');
+
+      if (sFilled) {
+        //### löst kein Ereignis beim observer aus wenn die Klasse nicht existiert (was sie ja nicht tut)
+        icon.classList.remove('ti-heart-filled');
+        icon.classList.add('ti-heart');
+      } else {
+        icon.classList.remove('ti-heart');
+        icon.classList.add('ti-heart-filled');
+      }
+      sFilled = !sFilled;
+    }
+
+
+    function changeWith_contains(evt) {
+      const icon = document.getElementById('classListIconC');
+
+      if (icon.classList.contains('ti-square-filled')) {
+        icon.classList.remove('ti-square-filled');
+        icon.classList.add('ti-square');
+      } else {
+        icon.classList.remove('ti-square');
+        icon.classList.add('ti-square-filled');
+      }
+    }
+
+    // ----- Test another API function of the workaround -----
+    const output = document.getElementById('output');
+    DEMO_ICONS.forEach(icon => {
+      const iconEl = document.createElement('i');
+      iconEl.className = `ti ${icon}`;
+      output.appendChild(iconEl);
+      const name = TABLER_WA.getIconClass(iconEl);
+
+      console.log(`### ${icon===name?'OK!':'ERR'}: '${icon}': '${name}'`);
+    });
+    document.getElementById('output').innerHTML = '';
+  </script>
+
+</body>
+</html>
